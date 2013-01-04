@@ -166,6 +166,95 @@ ggplot(diamonds, aes(x = clarity, y = ..count.., fill = cut)) + geom_bar(positio
 ggplot(diamonds, aes(x = clarity, y = ..count.., fill = cut)) + geom_bar(position = "identity")
 ggplot(diamonds, aes(x = clarity, y = ..count.., colour = cut)) + geom_freqpoly(aes(group = cut))
 
+#Combine geoms and stats
+d <- ggplot(diamonds, aes(carat)) + xlim(0, 3)
+d + stat_bin(aes(ymax = ..count..), binwidth = 0.1, geom = "area")
+
+d + stat_bin(aes(size = ..density..), binwidth = 0.1, geom = "point")
+d + stat_bin(aes(y = 1, fill = ..count..), binwidth = 0.1, geom = "tile", position = "identity")
+
+#Chapter 5
+##############################################################################################
+#Toolbox
+#Basic plot types
+library(ggplot2)
+library(plyr)
+
+df <- data.frame(x = c(3,1,5), y = c(2, 4, 6), label = c("a", "b", "c"))
+
+p <- ggplot(df, aes(x,y, label = label)) + xlab(NULL) + ylab(NULL)
+p + geom_point() + ggtitle("geom_point")
+p + geom_bar(stat = "identity") + ggtitle("geom_bar - \"identity\"")
+p + geom_line() + ggtitle("geom_line")
+p + geom_area() + ggtitle("geom_area")
+p + geom_path() + ggtitle("geom_path")
+p + geom_text() + ggtitle("geom_text")
+p + geom_tile() + ggtitle("geom_tile")
+p + geom_polygon() + ggtitle("geom_polygon")
+
+#Displaying distributions
+depth_dist <- ggplot(diamonds, aes(depth)) + xlim(58, 68)
+depth_dist + 
+  geom_histogram(aes(y = ..density..), binwidth = 0.1) +
+  facet_grid(cut ~ .)
+depth_dist + geom_histogram(aes(fill = cut), binwidth = 0.1, position = "fill")
+depth_dist + geom_freqpoly(aes(y = ..density.., colour = cut), binwidth = 0.1)
+
+ggplot(diamonds, aes(x = cut, y = depth)) + geom_boxplot()
+ggplot(diamonds, aes(x = carat, y = depth, group = round_any(carat, 0.1, floor))) + geom_boxplot() + xlim(0,3)
+
+ggplot(diamonds, aes(x = depth)) + geom_density(aes(fill = cut), alpha = 0.2) + xlim(54, 70)
+
+#Overplotting
+df <- data.frame(x = rnorm(2000), y = rnorm(2000))
+norm <- ggplot(df, aes(x,y))
+norm + geom_point()
+norm + geom_point(shape = 1)
+norm + geom_point(shape = ".")
+
+norm + geom_point(colour = alpha("black", 1/10))
+norm + geom_point(colour = "red", alpha = 1/10)
+
+td <- ggplot(diamonds, aes(table, depth)) + xlim(50, 70) + ylim(50, 70)
+td + geom_point()
+td + geom_jitter()
+td + geom_jitter(position = position_jitter(width = 0.5))
+td + geom_jitter(position = position_jitter(width = 0.5), alpha = 1/50)
+
+
+#Drawing maps
+library(maps)
+data(us.cities)
+big_cities <- subset(us.cities, pop > 500000)
+ggplot(big_cities, aes(x = long, y = lat)) + geom_point() + borders("state", size = 0.5)
+
+tx_cities <- subset(us.cities, country.etc == "TX")
+ggplot(tx_cities, aes(long, lat)) + geom_point() + borders("county", "texas", colour = "grey70")
+
+states <- map_data("state")
+arrests <- USArrests
+names(arrests) <- tolower(names(arrests))
+arrests$region <- tolower(rownames(USArrests))
+
+choro <- merge(states, arrests, by = "region")
+choro <- choro[order(choro$order),]
+ggplot(choro, aes(x = long, y = lat, group = group, fill = assault)) + geom_polygon()
+ggplot(choro, aes(x = long, y = lat, group = group, fill = assault/murder)) + geom_polygon()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
