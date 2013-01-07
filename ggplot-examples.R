@@ -242,11 +242,21 @@ ggplot(choro, aes(x = long, y = lat, group = group, fill = assault)) + geom_poly
 ggplot(choro, aes(x = long, y = lat, group = group, fill = assault/murder)) + geom_polygon()
 
 
+#Chapter 6
+##############################################################################################
+#scales, axes and legends
+p <- ggplot(msleep, aes(sleep_total, sleep_cycle, colour = vore)) + geom_point()
+p + scale_color_hue(name = "What does\nit eat?", 
+                    breaks = c("herbi", "carni", "omni"), 
+                    labels = c("plants", "meat", "both"))
 
+p + scale_color_hue(guide = guide_legend(title = "What does\nit eat?", 
+                    breaks = c("herbi", "carni", "omni"), 
+                    labels = c("plants", "meat", "both")))
 
+p + scale_colour_brewer(palette = "Set1")
 
-
-
+p + labs(x = "X", y = "Y", colour = "What does\nit eat", title = "Titel")
 
 
 

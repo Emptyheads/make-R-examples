@@ -36,4 +36,7 @@ x[x > 6] <- 0
 #Propose an alternative:
 x[x<6] <- 0
 
-
+#Class of x - mode?
+x <- matrix("1:6", 2, 3)
+class(x)
+mode(x)
