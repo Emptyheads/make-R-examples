@@ -258,19 +258,79 @@ p + scale_colour_brewer(palette = "Set1")
 
 p + labs(x = "X", y = "Y", colour = "What does\nit eat", title = "Titel")
 
+p <- ggplot(mtcars, aes(cyl, wt)) + geom_point()
+p + scale_x_continuous(breaks = c(5.5, 6.5))
+p + scale_x_continuous(limits = c(5.5, 6.5))
+
+p <- ggplot(mtcars, aes(wt, cyl, colour = cyl)) + geom_point()
+p + scale_colour_gradient(breaks = c(5.5, 6.5))
+p + scale_colour_gradient(limits = c(5.5, 6.5))
+
+p + xlim(5,2)
 
 
+point <- ggplot(msleep, aes(log(brainwt), log(bodywt), colour = vore)) + geom_point()
+point + scale_colour_brewer(palette = "Set1")
+point + scale_colour_brewer(palette = "Set2")
+point + scale_colour_brewer(palette = "Pastel1")
+
+bar <- ggplot(diamonds, aes(x = clarity, y = ..count.., fill = cut)) + geom_bar(position = "fill")
+bar + scale_fill_brewer(palette = 2)
+bar + scale_fill_brewer(palette = 3)
+bar + scale_fill_brewer(palette = "Set1")
+bar + scale_fill_manual(values = c("red", "orange", "yellow", "green", "blue"))
+bar + scale_fill_manual(values = c("Fair" = "red", "Good" = "orange", "Premium" = "yellow", "Ideal" = "green", "Very Good" = "blue"))
+
+data(LakeHuron)
+huron <- data.frame(year = 1875:1972, level = LakeHuron)
+ggplot(huron, aes(year)) + 
+  geom_line(aes(y = level - 5), colour = "blue") +
+  geom_line(aes(y = level + 5), colour = "red")
+
+ggplot(huron, aes(year)) + 
+  geom_line(aes(y = level - 5, colour = "below")) +
+  geom_line(aes(y = level + 5, colour = "above"))
+
+gg.huron <- ggplot(huron, aes(year)) + 
+  geom_line(aes(y = level - 5, colour = "below")) +
+  geom_line(aes(y = level + 5, colour = "above"))
+
+gg.huron  + scale_colour_manual(values = c("below" = "blue", "above" = "red")) + labs(colour = "Direction")
 
 
+#Chapter 7
+##############################################################################################
+#Faceting
+mpg2 <- subset(mpg, cyl != 5 & drv %in% c("4", "f"))
+p <- ggplot(mpg2)
+p + geom_point(aes(cty, hwy)) + facet_grid(. ~ cyl)
+p + geom_histogram(aes(x = cty, y = ..count..)) + facet_grid(cyl ~ .)
+p + geom_point(aes(cty, hwy)) + facet_grid(drv ~ cyl)
 
+p + geom_point(aes(cty, hwy)) + facet_grid(drv ~ cyl, margins = T)
+p + geom_point(aes(cty, hwy)) + facet_grid(drv ~ cyl, margins = c("cyl"))
 
+p + geom_point(aes(cty, hwy)) + facet_wrap(drv ~ cyl, nrow = 2, ncol = 4, scales = "free")
 
+#Chapter 8
+##############################################################################################
+#Themes
+p <- ggplot(data = dsmall, aes(carat, price, colour = cut)) +
+  geom_point() +
+  scale_colour_brewer("Legend", palette = "Set1", labels = c("Label1", "Label2", "Label3", "Label4", "Label5")) + 
+  scale_x_continuous(breaks = pretty_breaks(n=5)) + 
+  labs(title = "Title", x = "X-Label", y = "Y-Label") + 
+  scale_y_continuous(breaks = c(0,5000,10000, 15000, 17500)) +
+  theme_bw() 
+p + theme(axis.title.y = element_text(colour = "yellow", face="bold"),
+                     axis.text.y = element_text(colour = "black", angle=10),
+        #legend.position = c(0.1, 0.5))
+        legend.position = "bottom")
 
-
-
-
-
-
+p + theme_bw()
+p + theme_classic()
+p + theme_gray()
+p + theme_minimal()
 
 
 

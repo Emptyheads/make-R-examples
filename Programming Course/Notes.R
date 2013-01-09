@@ -40,3 +40,20 @@ x[x<6] <- 0
 x <- matrix("1:6", 2, 3)
 class(x)
 mode(x)
+
+
+#Programming Assignment 1 Quiz
+df <- read.csv("Programming Course/hw1_data.csv")
+df[1:2,]
+nrow(df)
+df[nrow(df):1,][2:1,]
+df$Ozone[47]
+table(is.na(df$Ozone))
+mean(df$Ozone, na.rm = T)
+sub.df <- df[df$Ozone > 31 & df$Temp > 90,]
+mean(sub.df$Solar.R, na.rm = T)
+mean(df[df$Month == 6,]$Temp, na.rm = T)
+
+
+
+
