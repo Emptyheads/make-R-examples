@@ -1,6 +1,14 @@
 library(ggplot2)
-data(CO2)
+library(mgcv)
+library(splines)
+library(MASS)
+library(mlmRev)
+library(scales)
+library(plyr)
+library(maps)
 
+
+data(CO2)
 str(CO2)
 gg.scatter <- ggplot(aes(x = uptake, y = conc, colour = Treatment), data = CO2) + geom_point()
 
@@ -10,7 +18,6 @@ gg.scatter + scale_color_brewer(palette = "Blues")
 #Chapter 2
 ##############################################################################################
 #qplot-examples
-
 data(diamonds)
 
 #Scatterplot
@@ -24,6 +31,7 @@ set.seed(1410)
 dsmall <- diamonds[sample(nrow(diamonds), 100),]
 qplot(carat, price, data = dsmall, colour = color)
 qplot(carat, price, data = dsmall, shape = cut)
+#qplot(carat, price, data = dsmall, size = cut)
 
 #scatterplot with alpha
 qplot(carat, price, data = diamonds, alpha = I(1/10))
@@ -39,17 +47,16 @@ qplot(carat, price, data = diamonds, geom = c("point", "smooth"))
 
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), span = 0.2)
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), span = 1)
-#smooth for generalized additive models
-library(mgcv)
+
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), method = "gam", formula = y ~ s(x))
 qplot(carat, price, data = diamonds, geom = c("point", "smooth"), method = "gam", formula = y ~ s(x, bs = "cs"))
 
-library(splines)
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), method = "lm")
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"), method = "lm", formula = y ~ poly(x, 3))
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), method = "lm", formula = y ~ ns(x,5))
 
-library(MASS)
 qplot(carat, price, data = dsmall, geom = c("point", "smooth"), method = "rlm")
+
 
 #geom jitter/boxplot
 qplot(color, price / carat, data = diamonds)
@@ -68,11 +75,12 @@ qplot(carat, data = diamonds, geom = "histogram", binwidth = 0.01)
 
 #density/histogram with colour/fill
 qplot(carat, data = diamonds, geom = "density", colour = color)
+qplot(carat, data = diamonds, geom = "density", fill = color, alpha = I(1/3))
 qplot(carat, data = diamonds, geom = "histogram", fill = color)
 
 #geom - bar
 qplot(color, data = diamonds, geom = "bar")
-qplot(color, data = diamonds, geom = "bar", weight = carat) + scale_y_continuous("carat")
+qplot(color, data = diamonds, geom = "bar", weight = carat) + ylab("carat") #sum(diamonds[diamonds$color == "H",]$carat)
 
 #geom - line
 qplot(date, unemploy / pop, data = economics, geom = "line")
@@ -87,13 +95,14 @@ qplot(carat, data = diamonds, facets = color ~ ., geom = "histogram", binwidth =
 qplot(carat, ..density.., data = diamonds, facets = color ~ ., geom = "histogram", binwidth = 0.1, xlim = c(0, 3))
 
 
+qplot(x = displ, y = hwy, data = mpg, colour = factor(cyl))
+
+
 #Chapter 4
 ##############################################################################################
 #Build a plot layer by layer
 #layer-function
-library(scales)
-library(ggplot2)
-library(mlmRev)
+
 p <- ggplot(data = diamonds, aes(carat, price, colour = cut))
 p <- p + layer(geom = "point") #layer(geom, geom_params, stat, stat_params, data, mapping, position)
 
@@ -106,22 +115,33 @@ p + layer(geom = "bar",
 p + geom_histogram(binwidth = 2, fill = "steelblue")
 
 #Compare with qplot
-data(msleep)
-ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + geom_point()
-qplot(sleep_rem / sleep_total, awake, data = msleep) + geom_smooth()
-qplot(sleep_rem / sleep_total, awake, data = msleep, geom = c("point", "smooth"))
-ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + geom_point() + geom_smooth()
+# data(msleep)
+# ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + geom_point()
+# qplot(sleep_rem / sleep_total, awake, data = msleep) + geom_smooth()
+# qplot(sleep_rem / sleep_total, awake, data = msleep, geom = c("point", "smooth"))
+# ggplot(msleep, aes(sleep_rem / sleep_total, awake)) + geom_point() + geom_smooth()
+# 
+# p <- qplot(sleep_rem / sleep_total, awake, data = msleep)
+# summary(p)
 
-p <- qplot(sleep_rem / sleep_total, awake, data = msleep)
+qplot(carat, price, data = dsmall, geom = "point")
+ggplot(dsmall, aes(x = carat, y = price)) + geom_point()
+qplot(carat, price, data = dsmall, geom = c("point", "smooth"))
+qplot(carat, price, data = dsmall, geom = "point") + geom_smooth()
+ggplot(dsmall, aes(x = carat, y = price)) + geom_point() + geom_smooth()
+
+p <- qplot(carat, price, data = dsmall, geom = "point")
 summary(p)
 
 #Regular R-Objekts
 bestfit <- geom_smooth(method = "lm", colour = alpha("steelblue", .5), se = F, size = 2)
 p + bestfit
+ggplot(dsmall, aes(x = carat, y = price)) + geom_point() + bestfit
+ggplot(dsmall, aes(x = log(carat), y = log(price))) + geom_point() + bestfit
 
-qplot(sleep_rem, sleep_total, data = msleep) + bestfit
-qplot(awake, brainwt, data = msleep, log = "y") + bestfit
-qplot(bodywt, brainwt, data = msleep, log = "xy") + bestfit
+# qplot(sleep_rem, sleep_total, data = msleep) + bestfit
+# qplot(awake, brainwt, data = msleep, log = "y") + bestfit
+# qplot(bodywt, brainwt, data = msleep, log = "xy") + bestfit
 
 #Aesthetic mapping
 data(mtcars)
@@ -166,6 +186,7 @@ ggplot(diamonds, aes(x = clarity, y = ..count.., fill = cut)) + geom_bar(positio
 ggplot(diamonds, aes(x = clarity, y = ..count.., fill = cut)) + geom_bar(position = "identity")
 ggplot(diamonds, aes(x = clarity, y = ..count.., colour = cut)) + geom_freqpoly(aes(group = cut))
 
+
 #Combine geoms and stats
 d <- ggplot(diamonds, aes(carat)) + xlim(0, 3)
 d + stat_bin(aes(ymax = ..count..), binwidth = 0.1, geom = "area")
@@ -177,8 +198,6 @@ d + stat_bin(aes(y = 1, fill = ..count..), binwidth = 0.1, geom = "tile", positi
 ##############################################################################################
 #Toolbox
 #Basic plot types
-library(ggplot2)
-library(plyr)
 
 df <- data.frame(x = c(3,1,5), y = c(2, 4, 6), label = c("a", "b", "c"))
 
@@ -221,9 +240,8 @@ td + geom_jitter()
 td + geom_jitter(position = position_jitter(width = 0.5))
 td + geom_jitter(position = position_jitter(width = 0.5), alpha = 1/50)
 
-
+############
 #Drawing maps
-library(maps)
 data(us.cities)
 big_cities <- subset(us.cities, pop > 500000)
 ggplot(big_cities, aes(x = long, y = lat)) + geom_point() + borders("state", size = 0.5)
@@ -332,6 +350,31 @@ p + theme_classic()
 p + theme_gray()
 p + theme_minimal()
 
+
+#Offene Übung
+##############################################################################################
+#Beispiel 1
+set.seed(1000)
+diamonds.sample <- diamonds[sample(rownames(diamonds),2000),]
+
+p <- ggplot(diamonds.sample, aes(color, price)) +
+  geom_boxplot(outlier.shape = NA) + 
+  geom_point(colour = "Black", alpha = 1/15, shape = "|", size = 12) +
+  labs(x = "Price", y = "Color", title = "Übung") +
+  scale_y_continuous(breaks = c(0, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 20000)) +
+  coord_flip() +
+  theme_classic() 
+ggsave(filename = "example_plot_1.pdf", plot = p, width = 10, height = 5)
+
+b <- ggplot(diamonds.sample, aes(x = log(price), y = log(carat))) + 
+  geom_point(aes(colour = color)) + 
+  facet_grid(cut~.) +
+  scale_colour_manual(values = c("blue", "grey", "grey", "grey", "grey", "grey", "grey"), breaks = c("D", "E"), labels = c("D","else")) +
+  geom_smooth(method = "lm", colour = "black", linetype = 2, se = F) + 
+  labs(title = "Übung 2", x = "Log price", y = "Log carat", colour = "Colour legend\ncolor") +
+  theme_bw() + theme(legend.position = "bottom", axis.title.y = element_text(angle = 0))
+
+ggsave(filename="example_plot_2.pdf", plot = b, width = 10, height = 10)
 
 
 
