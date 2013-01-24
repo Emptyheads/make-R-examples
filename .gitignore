@@ -4,3 +4,8 @@
 # Example code in package build process
 *-Ex.R
 .Rproj.user
+mean_example.Rmd
+mean_example.md
+mean_example.html
+figure/
+Programming Course/specdata/
