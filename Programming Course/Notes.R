@@ -55,5 +55,12 @@ mean(sub.df$Solar.R, na.rm = T)
 mean(df[df$Month == 6,]$Temp, na.rm = T)
 
 
+#Vectorizing
+rep(character_vector, each = some_factor)
+
+#vs.
+for(i in character_vector) {
+  
+}
 
 
